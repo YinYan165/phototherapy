@@ -34,54 +34,135 @@ export const BiliCalculator = () => {
     }
   };
 
+  // AAP 2022 Bilirubin Thresholds Implementation
+  const calculateThresholds = (ageHours, gestation, hasRiskFactors) => {
+    // Convert gestation to numeric value for calculations
+    let gestWeeks = 38; // default
+    if (gestation.includes('35 to 37')) gestWeeks = 36;
+    else if (gestation.includes('37 to 38')) gestWeeks = 37;
+    else if (gestation.includes('38 to 39')) gestWeeks = 38;
+    else if (gestation.includes('39+') || gestation.includes('40+')) gestWeeks = 39;
+
+    // AAP 2022 Phototherapy thresholds (mg/dL) - simplified implementation
+    const getPhototherapyThreshold = (age, gestation, riskFactors) => {
+      let baseThreshold;
+      
+      // Age-based thresholds for 38+ weeks gestation, no risk factors
+      if (age <= 24) baseThreshold = 12.0;
+      else if (age <= 48) baseThreshold = 15.0;
+      else if (age <= 72) baseThreshold = 17.0;
+      else if (age <= 96) baseThreshold = 18.5;
+      else if (age <= 120) baseThreshold = 20.0;
+      else baseThreshold = 21.0;
+
+      // Adjust for gestation
+      if (gestWeeks < 38) baseThreshold -= 2.0;
+      
+      // Adjust for risk factors (lower threshold)
+      if (riskFactors) baseThreshold -= 1.5;
+      
+      return Math.max(baseThreshold, 8.0); // minimum threshold
+    };
+
+    const getExchangeThreshold = (age, gestation, riskFactors) => {
+      let baseThreshold;
+      
+      // Age-based exchange thresholds
+      if (age <= 24) baseThreshold = 15.0;
+      else if (age <= 48) baseThreshold = 18.0;
+      else if (age <= 72) baseThreshold = 20.0;
+      else if (age <= 96) baseThreshold = 22.0;
+      else if (age <= 120) baseThreshold = 24.0;
+      else baseThreshold = 25.0;
+
+      // Adjust for gestation
+      if (gestWeeks < 38) baseThreshold -= 2.0;
+      
+      // Adjust for risk factors
+      if (riskFactors) baseThreshold -= 2.0;
+      
+      return Math.max(baseThreshold, 12.0); // minimum threshold
+    };
+
+    const photoThreshold = getPhototherapyThreshold(ageHours, gestWeeks, hasRiskFactors);
+    const exchangeThreshold = getExchangeThreshold(ageHours, gestWeeks, hasRiskFactors);
+
+    return {
+      phototherapy: parseFloat(photoThreshold.toFixed(1)),
+      exchange: parseFloat(exchangeThreshold.toFixed(1))
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Mock calculation logic
     const age = parseInt(formData.age);
     const bili = parseFloat(formData.bilirubin) || 0;
     
     if (age) {
-      // Mock results based on age and bilirubin level
-      let recommendation = "Continue observation";
-      let riskLevel = "Low";
-      let message = "";
+      const hasRiskFactors = formData.neurotoxicity === 'any-risk' || formData.neurotoxicity === 'show-both';
+      const thresholds = calculateThresholds(age, formData.gestation, hasRiskFactors);
+      
+      let recommendation = "";
+      let riskLevel = "";
+      let phototherapy = "";
+      let escalation = "";
+      let exchange = "";
+      let confirmatory = "";
       
       if (bili === 0) {
-        // If no bilirubin provided, show thresholds
-        message = "Thresholds displayed - enter bilirubin level for specific recommendations";
-        recommendation = "View age-specific bilirubin thresholds";
+        // Show thresholds only
+        recommendation = "Thresholds displayed - enter bilirubin level for specific recommendations";
         riskLevel = "Threshold View";
       } else {
-        // Calculate based on bilirubin level
-        if (bili > 25) {
-          recommendation = "Consider exchange transfusion - urgent consultation required";
-          riskLevel = "Very High";
-        } else if (bili > 20) {
-          recommendation = "Initiate phototherapy";
-          riskLevel = "High";
-        } else if (bili > 15) {
-          recommendation = "Consider phototherapy";
-          riskLevel = "Moderate";
+        // Determine recommendations based on bilirubin level vs thresholds
+        if (bili >= thresholds.exchange) {
+          riskLevel = "Critical";
+          recommendation = "Exchange transfusion recommended";
+          exchange = "URGENT: Exchange transfusion indicated";
+          escalation = "Immediate pediatric/neonatal intensive care consultation";
+          confirmatory = "Confirm with serum bilirubin if TcB used";
+        } else if (bili >= thresholds.phototherapy) {
+          if (bili >= (thresholds.exchange - 2)) {
+            riskLevel = "High";
+            recommendation = "Intensive phototherapy + prepare for exchange";
+            phototherapy = "Intensive phototherapy immediately";
+            escalation = "Prepare for possible exchange transfusion";
+          } else {
+            riskLevel = "Moderate";
+            recommendation = "Phototherapy indicated";
+            phototherapy = "Start phototherapy";
+            escalation = "Monitor closely, consider intensive phototherapy if levels rise";
+          }
+          confirmatory = "Confirm with serum bilirubin if TcB used";
+        } else if (bili >= (thresholds.phototherapy - 1)) {
+          riskLevel = "Low-Moderate";
+          recommendation = "Close monitoring required";
+          phototherapy = "Consider phototherapy";
+          escalation = "Repeat bilirubin in 4-6 hours";
+          confirmatory = "Confirm with serum bilirubin";
         } else {
-          recommendation = "Continue observation";
           riskLevel = "Low";
+          recommendation = "Continue routine monitoring";
+          phototherapy = "No phototherapy needed at this time";
+          escalation = "Routine follow-up";
+          confirmatory = "Current level acceptable";
         }
-      }
-      
-      // Adjust recommendations based on neurotoxicity risk
-      let riskAdjustment = "";
-      if (formData.neurotoxicity === 'any-risk') {
-        riskAdjustment = " (Risk factors present - lower thresholds apply)";
       }
       
       setResults({
         age: age,
+        ageDescription: `${age} hours (${Math.floor(age/24)} days ${age%24} hours)`,
         bilirubin: bili,
-        recommendation: recommendation + riskAdjustment,
+        thresholds: thresholds,
+        recommendation: recommendation,
         riskLevel: riskLevel,
         neurotoxicity: formData.neurotoxicity,
-        message: message,
-        gestation: formData.gestation
+        gestation: formData.gestation,
+        phototherapy: phototherapy,
+        escalation: escalation,
+        exchange: exchange,
+        confirmatory: confirmatory,
+        hasRiskFactors: hasRiskFactors
       });
     } else {
       alert("Por favor ingresa la edad en horas");
