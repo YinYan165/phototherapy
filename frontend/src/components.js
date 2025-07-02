@@ -220,19 +220,11 @@ export const BiliCalculator = () => {
     <div className="min-h-screen bg-teal-200">
       {/* Header */}
       <header className="bg-teal-700 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold">PediTools</h1>
-            <span className="ml-2 text-sm opacity-75">clinical tools for pediatric providers</span>
+        <div className="container mx-auto">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">Neonatal Phototherapy</h1>
+            <p className="text-sm opacity-75 mt-1">AAP 2022 Hyperbilirubinemia Management Calculator</p>
           </div>
-          <nav className="flex space-x-4">
-            <a href="#" className="text-sm hover:text-teal-200">PediTools</a>
-            <a href="#" className="text-sm hover:text-teal-200">What's new</a>
-            <a href="#" className="text-sm hover:text-teal-200">About PediTools</a>
-            <a href="#" className="text-sm hover:text-teal-200">Contact us</a>
-            <a href="#" className="text-sm hover:text-teal-200">Sitemap</a>
-            <a href="#" className="text-sm hover:text-teal-200">iOS Edition 2013</a>
-          </nav>
         </div>
       </header>
 
