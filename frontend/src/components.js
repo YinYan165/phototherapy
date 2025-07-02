@@ -38,33 +38,53 @@ export const BiliCalculator = () => {
     e.preventDefault();
     // Mock calculation logic
     const age = parseInt(formData.age);
-    const bili = parseFloat(formData.bilirubin);
+    const bili = parseFloat(formData.bilirubin) || 0;
     
-    if (age && bili) {
+    if (age) {
       // Mock results based on age and bilirubin level
       let recommendation = "Continue observation";
       let riskLevel = "Low";
+      let message = "";
       
-      if (bili > 15) {
-        recommendation = "Consider phototherapy";
-        riskLevel = "Moderate";
+      if (bili === 0) {
+        // If no bilirubin provided, show thresholds
+        message = "Thresholds displayed - enter bilirubin level for specific recommendations";
+        recommendation = "View age-specific bilirubin thresholds";
+        riskLevel = "Threshold View";
+      } else {
+        // Calculate based on bilirubin level
+        if (bili > 25) {
+          recommendation = "Consider exchange transfusion - urgent consultation required";
+          riskLevel = "Very High";
+        } else if (bili > 20) {
+          recommendation = "Initiate phototherapy";
+          riskLevel = "High";
+        } else if (bili > 15) {
+          recommendation = "Consider phototherapy";
+          riskLevel = "Moderate";
+        } else {
+          recommendation = "Continue observation";
+          riskLevel = "Low";
+        }
       }
-      if (bili > 20) {
-        recommendation = "Initiate phototherapy";
-        riskLevel = "High";
-      }
-      if (bili > 25) {
-        recommendation = "Consider exchange transfusion";
-        riskLevel = "Very High";
+      
+      // Adjust recommendations based on neurotoxicity risk
+      let riskAdjustment = "";
+      if (formData.neurotoxicity === 'any-risk') {
+        riskAdjustment = " (Risk factors present - lower thresholds apply)";
       }
       
       setResults({
         age: age,
         bilirubin: bili,
-        recommendation: recommendation,
+        recommendation: recommendation + riskAdjustment,
         riskLevel: riskLevel,
-        neurotoxicity: formData.neurotoxicity
+        neurotoxicity: formData.neurotoxicity,
+        message: message,
+        gestation: formData.gestation
       });
+    } else {
+      alert("Por favor ingresa la edad en horas");
     }
   };
 
