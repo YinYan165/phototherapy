@@ -34,32 +34,40 @@ export const BiliCalculator = () => {
     }
   };
 
-  // AAP 2022 Bilirubin Thresholds Implementation
+  // AAP 2022 Bilirubin Thresholds Implementation - CORRECTED
   const calculateThresholds = (ageHours, gestation, hasRiskFactors) => {
     // Convert gestation to numeric value for calculations
     let gestWeeks = 38; // default
-    if (gestation.includes('35 to 37')) gestWeeks = 36;
+    if (gestation.includes('35 to 36')) gestWeeks = 36;
     else if (gestation.includes('37 to 38')) gestWeeks = 37;
     else if (gestation.includes('38 to 39')) gestWeeks = 38;
-    else if (gestation.includes('39+') || gestation.includes('40+')) gestWeeks = 39;
+    else if (gestation.includes('39+')) gestWeeks = 39;
 
-    // AAP 2022 Phototherapy thresholds (mg/dL) - simplified implementation
+    // AAP 2022 Phototherapy thresholds (mg/dL) - More accurate implementation
     const getPhototherapyThreshold = (age, gestation, riskFactors) => {
       let baseThreshold;
       
-      // Age-based thresholds for 38+ weeks gestation, no risk factors
-      if (age <= 24) baseThreshold = 12.0;
-      else if (age <= 48) baseThreshold = 15.0;
-      else if (age <= 72) baseThreshold = 17.0;
-      else if (age <= 96) baseThreshold = 18.5;
-      else if (age <= 120) baseThreshold = 20.0;
-      else baseThreshold = 21.0;
+      // More precise age-based thresholds for 38+ weeks gestation, no risk factors
+      if (age <= 24) {
+        baseThreshold = 12.0 + (age - 12) * 0.2; // Linear increase from 12h to 24h
+      } else if (age <= 48) {
+        baseThreshold = 15.0 + ((age - 24) / 24) * 2.0; // 15-17 mg/dL
+      } else if (age <= 72) {
+        baseThreshold = 17.0 + ((age - 48) / 24) * 1.0; // 17-18 mg/dL
+      } else if (age <= 96) {
+        baseThreshold = 18.0 + ((age - 72) / 24) * 1.0; // 18-19 mg/dL
+      } else if (age <= 120) {
+        baseThreshold = 19.0 + ((age - 96) / 24) * 1.0; // 19-20 mg/dL
+      } else {
+        baseThreshold = 20.0;
+      }
 
-      // Adjust for gestation
-      if (gestWeeks < 38) baseThreshold -= 2.0;
+      // Adjust for gestation - lower thresholds for preterm
+      if (gestWeeks <= 36) baseThreshold -= 2.5;
+      else if (gestWeeks === 37) baseThreshold -= 1.5;
       
       // Adjust for risk factors (lower threshold)
-      if (riskFactors) baseThreshold -= 1.5;
+      if (riskFactors) baseThreshold -= 2.0;
       
       return Math.max(baseThreshold, 8.0); // minimum threshold
     };
@@ -67,19 +75,27 @@ export const BiliCalculator = () => {
     const getExchangeThreshold = (age, gestation, riskFactors) => {
       let baseThreshold;
       
-      // Age-based exchange thresholds
-      if (age <= 24) baseThreshold = 15.0;
-      else if (age <= 48) baseThreshold = 18.0;
-      else if (age <= 72) baseThreshold = 20.0;
-      else if (age <= 96) baseThreshold = 22.0;
-      else if (age <= 120) baseThreshold = 24.0;
-      else baseThreshold = 25.0;
+      // Age-based exchange thresholds - more precise
+      if (age <= 24) {
+        baseThreshold = 15.0 + (age - 12) * 0.25;
+      } else if (age <= 48) {
+        baseThreshold = 18.0 + ((age - 24) / 24) * 2.0; // 18-20 mg/dL
+      } else if (age <= 72) {
+        baseThreshold = 20.0 + ((age - 48) / 24) * 1.5; // 20-21.5 mg/dL
+      } else if (age <= 96) {
+        baseThreshold = 21.5 + ((age - 72) / 24) * 1.5; // 21.5-23 mg/dL
+      } else if (age <= 120) {
+        baseThreshold = 23.0 + ((age - 96) / 24) * 2.0; // 23-25 mg/dL
+      } else {
+        baseThreshold = 25.0;
+      }
 
       // Adjust for gestation
-      if (gestWeeks < 38) baseThreshold -= 2.0;
+      if (gestWeeks <= 36) baseThreshold -= 3.0;
+      else if (gestWeeks === 37) baseThreshold -= 2.0;
       
       // Adjust for risk factors
-      if (riskFactors) baseThreshold -= 2.0;
+      if (riskFactors) baseThreshold -= 3.0;
       
       return Math.max(baseThreshold, 12.0); // minimum threshold
     };
@@ -108,37 +124,51 @@ export const BiliCalculator = () => {
       let escalation = "";
       let exchange = "";
       let confirmatory = "";
+      let intensivePhototherapy = false;
+      let discontinuationLevel = "";
       
       if (bili === 0) {
         // Show thresholds only
         recommendation = "Thresholds displayed - enter bilirubin level for specific recommendations";
         riskLevel = "Threshold View";
       } else {
+        // Calculate discontinuation level (usually ~3-4 mg/dL below phototherapy threshold)
+        const discontinuationThreshold = Math.max(thresholds.phototherapy - 4.0, 8.0);
+        discontinuationLevel = `If initiating phototherapy for this measurement, consider discontinuation when bilirubin less than ${discontinuationThreshold.toFixed(1)} mg/dL`;
+        
         // Determine recommendations based on bilirubin level vs thresholds
         if (bili >= thresholds.exchange) {
           riskLevel = "Critical";
-          recommendation = "Exchange transfusion recommended";
-          exchange = "URGENT: Exchange transfusion indicated";
-          escalation = "Immediate pediatric/neonatal intensive care consultation";
-          confirmatory = "Confirm with serum bilirubin if TcB used";
+          recommendation = "URGENT: Exchange transfusion indicated";
+          exchange = "IMMEDIATE exchange transfusion required";
+          escalation = "Emergency neonatology consultation - do not delay";
+          confirmatory = "Confirm immediately with serum bilirubin";
+          phototherapy = "Intensive phototherapy while preparing for exchange";
+          intensivePhototherapy = true;
+        } else if (bili >= (thresholds.exchange - 3)) {
+          riskLevel = "Very High";
+          recommendation = "Intensive phototherapy + prepare for exchange";
+          phototherapy = "INTENSIVE phototherapy immediately";
+          escalation = "Prepare for possible exchange transfusion";
+          confirmatory = "Confirm with serum bilirubin immediately";
+          intensivePhototherapy = true;
         } else if (bili >= thresholds.phototherapy) {
-          if (bili >= (thresholds.exchange - 2)) {
-            riskLevel = "High";
-            recommendation = "Intensive phototherapy + prepare for exchange";
-            phototherapy = "Intensive phototherapy immediately";
-            escalation = "Prepare for possible exchange transfusion";
-          } else {
-            riskLevel = "Moderate";
-            recommendation = "Phototherapy indicated";
-            phototherapy = "Start phototherapy";
-            escalation = "Monitor closely, consider intensive phototherapy if levels rise";
-          }
+          riskLevel = "High";
+          recommendation = "Phototherapy indicated";
+          phototherapy = "Start phototherapy immediately";
+          escalation = "Monitor bilirubin every 4-6 hours";
           confirmatory = "Confirm with serum bilirubin if TcB used";
-        } else if (bili >= (thresholds.phototherapy - 1)) {
-          riskLevel = "Low-Moderate";
-          recommendation = "Close monitoring required";
-          phototherapy = "Consider phototherapy";
-          escalation = "Repeat bilirubin in 4-6 hours";
+          
+          // Check if intensive phototherapy is needed
+          if (bili >= (thresholds.phototherapy + 2)) {
+            phototherapy = "INTENSIVE phototherapy immediately";
+            intensivePhototherapy = true;
+          }
+        } else if (bili >= (thresholds.phototherapy - 2)) {
+          riskLevel = "Moderate";
+          recommendation = "Close monitoring - approaching phototherapy threshold";
+          phototherapy = "Phototherapy may be needed soon";
+          escalation = "Repeat bilirubin in 2-4 hours";
           confirmatory = "Confirm with serum bilirubin";
         } else {
           riskLevel = "Low";
@@ -152,7 +182,7 @@ export const BiliCalculator = () => {
       setResults({
         age: age,
         ageDescription: `${age} hours (${Math.floor(age/24)} days ${age%24} hours)`,
-        bilirubin: bili,
+        bilirubin: bili, // KEEP EXACT VALUE ENTERED
         thresholds: thresholds,
         recommendation: recommendation,
         riskLevel: riskLevel,
@@ -162,7 +192,9 @@ export const BiliCalculator = () => {
         escalation: escalation,
         exchange: exchange,
         confirmatory: confirmatory,
-        hasRiskFactors: hasRiskFactors
+        hasRiskFactors: hasRiskFactors,
+        intensivePhototherapy: intensivePhototherapy,
+        discontinuationLevel: discontinuationLevel
       });
     } else {
       alert("Por favor ingresa la edad en horas");
