@@ -488,20 +488,30 @@ export const BiliCalculator = () => {
                       <div className="mb-4 p-4 rounded" style={{
                         backgroundColor: 
                           results.riskLevel === 'Low' ? '#f0f9ff' :
-                          results.riskLevel === 'Low-Moderate' ? '#fffbeb' :
                           results.riskLevel === 'Moderate' ? '#fef3c7' :
-                          results.riskLevel === 'High' ? '#fed7aa' : '#fecaca'
+                          results.riskLevel === 'High' ? '#fed7d7' :
+                          results.riskLevel === 'Very High' ? '#fecaca' :
+                          results.riskLevel === 'Critical' ? '#fee2e2' : '#fffbeb'
                       }}>
                         <h4 className="font-semibold mb-2">Risk Assessment:</h4>
                         <p className={`text-lg font-bold ${
                           results.riskLevel === 'Low' ? 'text-blue-800' :
-                          results.riskLevel === 'Low-Moderate' ? 'text-yellow-700' :
                           results.riskLevel === 'Moderate' ? 'text-yellow-800' :
-                          results.riskLevel === 'High' ? 'text-orange-800' : 'text-red-800'
+                          results.riskLevel === 'High' ? 'text-red-700' :
+                          results.riskLevel === 'Very High' ? 'text-red-800' :
+                          results.riskLevel === 'Critical' ? 'text-red-900' : 'text-gray-700'
                         }`}>
                           {results.riskLevel} Risk
                         </p>
-                        <p className="text-sm mt-1">{results.recommendation}</p>
+                        <p className="text-sm mt-1 font-medium">{results.recommendation}</p>
+                        
+                        {/* Intensive Phototherapy Alert */}
+                        {results.intensivePhototherapy && (
+                          <div className="mt-3 p-3 bg-red-100 border border-red-400 rounded">
+                            <p className="text-red-800 font-bold">⚠️ INTENSIVE PHOTOTHERAPY REQUIRED</p>
+                            <p className="text-red-700 text-sm">Double or triple phototherapy units recommended</p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Clinical Actions */}
@@ -511,9 +521,30 @@ export const BiliCalculator = () => {
                           <p className="text-blue-700">{results.confirmatory}</p>
                         </div>
 
-                        <div className="p-3 bg-green-50 rounded border-l-4 border-green-500">
-                          <h4 className="font-semibold text-green-800">Phototherapy:</h4>
-                          <p className="text-green-700">{results.phototherapy}</p>
+                        <div className={`p-3 rounded border-l-4 ${
+                          results.riskLevel === 'Low' ? 'bg-green-50 border-green-500' :
+                          results.riskLevel === 'Moderate' ? 'bg-yellow-50 border-yellow-500' :
+                          'bg-red-50 border-red-500'
+                        }`}>
+                          <h4 className={`font-semibold ${
+                            results.riskLevel === 'Low' ? 'text-green-800' :
+                            results.riskLevel === 'Moderate' ? 'text-yellow-800' :
+                            'text-red-800'
+                          }`}>Phototherapy:</h4>
+                          <p className={`${
+                            results.riskLevel === 'Low' ? 'text-green-700' :
+                            results.riskLevel === 'Moderate' ? 'text-yellow-700' :
+                            'text-red-700'
+                          }`}>{results.phototherapy}</p>
+                          
+                          {/* Discontinuation message */}
+                          {results.discontinuationLevel && results.riskLevel !== 'Low' && (
+                            <div className="mt-2 p-2 bg-gray-100 rounded border">
+                              <p className="text-gray-800 text-sm font-medium">
+                                📝 {results.discontinuationLevel}
+                              </p>
+                            </div>
+                          )}
                         </div>
 
                         <div className="p-3 bg-purple-50 rounded border-l-4 border-purple-500">
@@ -524,7 +555,7 @@ export const BiliCalculator = () => {
                         {results.exchange && (
                           <div className="p-3 bg-red-50 rounded border-l-4 border-red-500">
                             <h4 className="font-semibold text-red-800">Exchange Transfusion:</h4>
-                            <p className="text-red-700">{results.exchange}</p>
+                            <p className="text-red-700 font-bold">{results.exchange}</p>
                           </div>
                         )}
                       </div>
