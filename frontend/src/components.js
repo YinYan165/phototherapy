@@ -222,10 +222,10 @@ export const BiliCalculator = () => {
                     onChange={handleInputChange}
                     className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   >
-                    <option value="35 to 40+ weeks">35 to 40+ weeks</option>
-                    <option value="38 to 39 weeks">38 to 39 weeks</option>
+                    <option value="35 to 36 weeks">35 to 36 weeks</option>
                     <option value="37 to 38 weeks">37 to 38 weeks</option>
-                    <option value="35 to 37 weeks">35 to 37 weeks</option>
+                    <option value="38 to 39 weeks">38 to 39 weeks</option>
+                    <option value="39+ weeks">39+ weeks</option>
                   </select>
                 </div>
 
