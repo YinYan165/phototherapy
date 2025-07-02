@@ -840,19 +840,6 @@ export const BiliCalculator = () => {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white p-4 mt-12">
-        <div className="container mx-auto text-center">
-          <p className="text-sm">
-            <a href="#" className="text-teal-400 hover:text-teal-300">• PediTools</a>
-            <span className="mx-2">•</span>
-            <a href="#" className="text-teal-400 hover:text-teal-300">Bilirubin 2022</a>
-            <span className="mx-2">•</span>
-          </p>
-          <p className="text-xs mt-2 text-gray-400">© 2012 - 2025 Joseph Choi</p>
-        </div>
-      </footer>
     </div>
   );
 };
