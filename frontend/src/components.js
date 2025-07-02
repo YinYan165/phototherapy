@@ -337,17 +337,54 @@ export const BiliCalculator = () => {
             {results && (
               <div className="bg-white bg-opacity-70 p-6 rounded-lg border-2 border-teal-600">
                 <h3 className="text-lg font-semibold mb-4 text-teal-800">Calculation Results</h3>
-                <div className="space-y-2">
-                  <p><strong>Age:</strong> {results.age} hours</p>
-                  <p><strong>Bilirubin Level:</strong> {results.bilirubin} mg/dL</p>
-                  <p><strong>Risk Level:</strong> <span className={`font-semibold ${
-                    results.riskLevel === 'Low' ? 'text-green-600' :
-                    results.riskLevel === 'Moderate' ? 'text-yellow-600' :
-                    results.riskLevel === 'High' ? 'text-orange-600' : 'text-red-600'
-                  }`}>{results.riskLevel}</span></p>
-                  <p><strong>Recommendation:</strong> {results.recommendation}</p>
-                  <p><strong>Neurotoxicity Risk:</strong> {results.neurotoxicity === 'no-risk' ? 'No risk factors' : 
-                                                         results.neurotoxicity === 'any-risk' ? 'ANY risk factors' : 'Both shown'}</p>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <p><strong>Age:</strong> {results.age} hours</p>
+                    <p><strong>Gestation:</strong> {results.gestation}</p>
+                  </div>
+                  
+                  {results.bilirubin > 0 ? (
+                    <p><strong>Bilirubin Level:</strong> {results.bilirubin} mg/dL</p>
+                  ) : (
+                    <p className="text-blue-600 italic">Bilirubin not provided - showing thresholds only</p>
+                  )}
+                  
+                  <div className="bg-gray-50 p-3 rounded">
+                    <p><strong>Risk Level:</strong> 
+                      <span className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                        results.riskLevel === 'Low' ? 'bg-green-100 text-green-800' :
+                        results.riskLevel === 'Moderate' ? 'bg-yellow-100 text-yellow-800' :
+                        results.riskLevel === 'High' ? 'bg-orange-100 text-orange-800' : 
+                        results.riskLevel === 'Very High' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {results.riskLevel}
+                      </span>
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                    <p><strong>Clinical Recommendation:</strong></p>
+                    <p className="text-blue-800 mt-1">{results.recommendation}</p>
+                  </div>
+                  
+                  <p><strong>Neurotoxicity Risk:</strong> 
+                    <span className="ml-2">{
+                      results.neurotoxicity === 'no-risk' ? 'No risk factors present' : 
+                      results.neurotoxicity === 'any-risk' ? 'Risk factors present' : 
+                      'Both risk scenarios shown'
+                    }</span>
+                  </p>
+                  
+                  {results.message && (
+                    <div className="bg-yellow-50 p-3 rounded border-l-4 border-yellow-500">
+                      <p className="text-yellow-800">{results.message}</p>
+                    </div>
+                  )}
+                  
+                  <div className="text-xs text-gray-600 mt-4 p-2 bg-gray-100 rounded">
+                    <p><strong>Note:</strong> This is a clinical decision support tool. All recommendations should be interpreted in the context of clinical assessment and institutional guidelines.</p>
+                  </div>
                 </div>
               </div>
             )}
