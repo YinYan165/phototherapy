@@ -574,69 +574,127 @@ export const BiliCalculator = () => {
                   </div>
                 </div>
 
-                {/* Bilirubin Curve Graph */}
+                {/* Bilirubin Curve Graph - IMPROVED */}
                 <div className="bg-white bg-opacity-90 p-6 rounded-lg border-2 border-teal-600">
                   <h3 className="text-lg font-semibold mb-4 text-teal-800">Bilirubin Nomogram</h3>
-                  <div className="relative w-full h-64 bg-gray-50 rounded border">
-                    <svg viewBox="0 0 400 200" className="w-full h-full">
+                  <div className="relative w-full h-80 bg-gray-50 rounded border">
+                    <svg viewBox="0 0 500 300" className="w-full h-full">
                       {/* Grid lines */}
                       <defs>
-                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+                        <pattern id="grid" width="25" height="15" patternUnits="userSpaceOnUse">
+                          <path d="M 25 0 L 0 0 0 15" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
                         </pattern>
                       </defs>
-                      <rect width="400" height="200" fill="url(#grid)" />
+                      <rect width="500" height="300" fill="url(#grid)" />
                       
                       {/* Axes */}
-                      <line x1="40" y1="160" x2="360" y2="160" stroke="#374151" strokeWidth="2"/>
-                      <line x1="40" y1="160" x2="40" y2="20" stroke="#374151" strokeWidth="2"/>
+                      <line x1="60" y1="240" x2="450" y2="240" stroke="#374151" strokeWidth="3"/>
+                      <line x1="60" y1="240" x2="60" y2="30" stroke="#374151" strokeWidth="3"/>
                       
-                      {/* Age labels (X-axis) */}
-                      <text x="80" y="175" textAnchor="middle" className="text-xs" fill="#374151">24h</text>
-                      <text x="120" y="175" textAnchor="middle" className="text-xs" fill="#374151">48h</text>
-                      <text x="160" y="175" textAnchor="middle" className="text-xs" fill="#374151">72h</text>
-                      <text x="200" y="175" textAnchor="middle" className="text-xs" fill="#374151">96h</text>
-                      <text x="240" y="175" textAnchor="middle" className="text-xs" fill="#374151">120h</text>
-                      <text x="320" y="175" textAnchor="middle" className="text-xs" fill="#374151">168h</text>
+                      {/* Age labels (X-axis) - More detailed */}
+                      <text x="80" y="255" textAnchor="middle" className="text-xs" fill="#374151">12h</text>
+                      <text x="120" y="255" textAnchor="middle" className="text-xs" fill="#374151">24h</text>
+                      <text x="160" y="255" textAnchor="middle" className="text-xs" fill="#374151">36h</text>
+                      <text x="200" y="255" textAnchor="middle" className="text-xs" fill="#374151">48h</text>
+                      <text x="240" y="255" textAnchor="middle" className="text-xs" fill="#374151">60h</text>
+                      <text x="280" y="255" textAnchor="middle" className="text-xs" fill="#374151">72h</text>
+                      <text x="320" y="255" textAnchor="middle" className="text-xs" fill="#374151">96h</text>
+                      <text x="360" y="255" textAnchor="middle" className="text-xs" fill="#374151">120h</text>
+                      <text x="400" y="255" textAnchor="middle" className="text-xs" fill="#374151">168h</text>
                       
                       {/* Bilirubin labels (Y-axis) */}
-                      <text x="35" y="145" textAnchor="end" className="text-xs" fill="#374151">5</text>
-                      <text x="35" y="125" textAnchor="end" className="text-xs" fill="#374151">10</text>
-                      <text x="35" y="105" textAnchor="end" className="text-xs" fill="#374151">15</text>
-                      <text x="35" y="85" textAnchor="end" className="text-xs" fill="#374151">20</text>
-                      <text x="35" y="65" textAnchor="end" className="text-xs" fill="#374151">25</text>
-                      <text x="35" y="45" textAnchor="end" className="text-xs" fill="#374151">30</text>
+                      <text x="55" y="235" textAnchor="end" className="text-xs" fill="#374151">0</text>
+                      <text x="55" y="215" textAnchor="end" className="text-xs" fill="#374151">5</text>
+                      <text x="55" y="195" textAnchor="end" className="text-xs" fill="#374151">10</text>
+                      <text x="55" y="175" textAnchor="end" className="text-xs" fill="#374151">15</text>
+                      <text x="55" y="155" textAnchor="end" className="text-xs" fill="#374151">20</text>
+                      <text x="55" y="135" textAnchor="end" className="text-xs" fill="#374151">25</text>
+                      <text x="55" y="115" textAnchor="end" className="text-xs" fill="#374151">30</text>
                       
-                      {/* Phototherapy threshold line */}
-                      <path d="M 60 140 L 100 120 L 140 110 L 180 100 L 220 95 L 300 90" 
+                      {/* Axis labels */}
+                      <text x="255" y="285" textAnchor="middle" className="text-sm font-medium" fill="#374151">Age (hours)</text>
+                      <text x="25" y="135" textAnchor="middle" className="text-sm font-medium" fill="#374151" transform="rotate(-90 25 135)">Bilirubin (mg/dL)</text>
+                      
+                      {/* Phototherapy threshold line - More accurate curve */}
+                      <path d="M 80 220 Q 120 205 160 190 Q 200 180 240 175 Q 280 170 320 168 Q 360 166 400 165" 
                             fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="5,5"/>
                       
-                      {/* Exchange threshold line */}
-                      <path d="M 60 120 L 100 100 L 140 90 L 180 80 L 220 75 L 300 70" 
+                      {/* Exchange threshold line - More accurate curve */}
+                      <path d="M 80 195 Q 120 175 160 160 Q 200 150 240 145 Q 280 140 320 138 Q 360 136 400 135" 
                             fill="none" stroke="#dc2626" strokeWidth="3"/>
                       
-                      {/* Current patient point */}
+                      {/* Current patient point - More accurate positioning */}
                       {results.bilirubin > 0 && (
-                        <circle 
-                          cx={40 + (results.age * 1.5)} 
-                          cy={160 - (results.bilirubin * 4)} 
-                          r="5" 
-                          fill="#059669" 
-                          stroke="#ffffff" 
-                          strokeWidth="2"
-                        />
+                        <>
+                          <circle 
+                            cx={60 + (results.age * 2.3)} 
+                            cy={240 - (results.bilirubin * 6.5)} 
+                            r="6" 
+                            fill={results.riskLevel === 'Low' ? '#059669' : results.riskLevel === 'Moderate' ? '#d97706' : '#dc2626'} 
+                            stroke="#ffffff" 
+                            strokeWidth="2"
+                          />
+                          <text 
+                            x={65 + (results.age * 2.3)} 
+                            y={235 - (results.bilirubin * 6.5)} 
+                            className="text-xs font-bold" 
+                            fill={results.riskLevel === 'Low' ? '#059669' : results.riskLevel === 'Moderate' ? '#d97706' : '#dc2626'}
+                          >
+                            {results.bilirubin}
+                          </text>
+                        </>
+                      )}
+                      
+                      {/* Threshold values at current age */}
+                      {results.bilirubin > 0 && (
+                        <>
+                          <circle 
+                            cx={60 + (results.age * 2.3)} 
+                            cy={240 - (results.thresholds.phototherapy * 6.5)} 
+                            r="3" 
+                            fill="#f59e0b" 
+                            opacity="0.7"
+                          />
+                          <text 
+                            x={65 + (results.age * 2.3)} 
+                            y={245 - (results.thresholds.phototherapy * 6.5)} 
+                            className="text-xs" 
+                            fill="#f59e0b"
+                          >
+                            PT: {results.thresholds.phototherapy}
+                          </text>
+                          
+                          <circle 
+                            cx={60 + (results.age * 2.3)} 
+                            cy={240 - (results.thresholds.exchange * 6.5)} 
+                            r="3" 
+                            fill="#dc2626" 
+                            opacity="0.7"
+                          />
+                          <text 
+                            x={65 + (results.age * 2.3)} 
+                            y={245 - (results.thresholds.exchange * 6.5)} 
+                            className="text-xs" 
+                            fill="#dc2626"
+                          >
+                            EX: {results.thresholds.exchange}
+                          </text>
+                        </>
                       )}
                       
                       {/* Legend */}
-                      <g transform="translate(250, 30)">
-                        <line x1="0" y1="0" x2="20" y2="0" stroke="#f59e0b" strokeWidth="3" strokeDasharray="5,5"/>
-                        <text x="25" y="4" className="text-xs" fill="#f59e0b">Phototherapy</text>
-                        <line x1="0" y1="15" x2="20" y2="15" stroke="#dc2626" strokeWidth="3"/>
-                        <text x="25" y="19" className="text-xs" fill="#dc2626">Exchange</text>
+                      <g transform="translate(320, 50)">
+                        <rect x="-5" y="-5" width="130" height="70" fill="white" stroke="#ccc" rx="3"/>
+                        <line x1="5" y1="10" x2="25" y2="10" stroke="#f59e0b" strokeWidth="3" strokeDasharray="5,5"/>
+                        <text x="30" y="14" className="text-xs" fill="#f59e0b">Phototherapy</text>
+                        <line x1="5" y1="25" x2="25" y2="25" stroke="#dc2626" strokeWidth="3"/>
+                        <text x="30" y="29" className="text-xs" fill="#dc2626">Exchange</text>
                         {results.bilirubin > 0 && (
                           <>
-                            <circle cx="10" cy="30" r="4" fill="#059669"/>
-                            <text x="25" y="34" className="text-xs" fill="#059669">Patient</text>
+                            <circle cx="15" cy="40" r="4" fill={results.riskLevel === 'Low' ? '#059669' : results.riskLevel === 'Moderate' ? '#d97706' : '#dc2626'}/>
+                            <text x="30" y="44" className="text-xs" fill={results.riskLevel === 'Low' ? '#059669' : results.riskLevel === 'Moderate' ? '#d97706' : '#dc2626'}>Patient ({results.bilirubin})</text>
+                            <circle cx="15" cy="55" r="2" fill="#666"/>
+                            <text x="30" y="59" className="text-xs" fill="#666">Thresholds</text>
                           </>
                         )}
                       </g>
@@ -644,7 +702,10 @@ export const BiliCalculator = () => {
                   </div>
                   <p className="text-xs text-gray-600 mt-2">
                     <strong>Graph:</strong> Age-specific bilirubin thresholds for {results.gestation} gestation
-                    {results.hasRiskFactors && ' with neurotoxicity risk factors'}
+                    {results.hasRiskFactors && ' with neurotoxicity risk factors present'}
+                    <br />
+                    PT = Phototherapy threshold ({results.thresholds.phototherapy} mg/dL), 
+                    EX = Exchange threshold ({results.thresholds.exchange} mg/dL)
                   </p>
                 </div>
 
